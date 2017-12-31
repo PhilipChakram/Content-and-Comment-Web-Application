@@ -10,25 +10,12 @@ import {
   VOTE_COMMENT,
 } from '../actions'
 
-// const fetchURL = (url) => {
-//     	console.log('fetching from url at index', url);
-//     	return fetch(url, { headers: { 'Authorization': 'whatever-you-want' }} )
-//       	.then( (res) => res.json())
-//       	.then((post) => {
-//       		console.log(post);
-//       		return {post};
-//       	});
-// }
-
-// const url1 = `http://localhost:3001/posts`;
-
-// const initialPost = fetchURL(url1).then(alert);
 
 function posts (state = {}, action) {
 	switch (action.type) {
 		case INIT_POST :
 			const {posts} = action
-			console.log('From reducer', posts.post);
+			console.log('From reducer initial state', state);
 			return posts
 
 		case ADD_POST :
@@ -52,29 +39,50 @@ function posts (state = {}, action) {
 				post:[...b]
 			}
 
-		// case REMOVE_POST :
-		// 	const {id, deleted} = action
-		// 	return {
-		// 		...state,
-		// 		[id]: {
-		// 			...state[id],
-		// 			deleted: deleted,
-		// 		}
-		// 	}
+		case REMOVE_POST :
+			const ID = action.id;
+			let a = state.post;
+			a = a.map((post) => {
+				if(post.id === ID)
+					post.deleted = true;
+				return post;
+			})
+			a = a.filter((post)=> post.deleted === false)
+
+			console.log(a);
+			return {
+				post:[...a]
+			}
 
 		default :
 			return state
 	}
 }
 
-function comment (state = {}, action) {
+function comment (state = {comments:[]}, action) {
 	switch(action.type) {
 		case INIT_COMMENT :
-			const { comment } = action
-			return comment
+			const {id, comment } = action;
+			console.log("Comment reducer", id, comment);
+			console.log("State", state);
+			let c = state.comments;
+			const bdy = {
+				id:id,
+				comments:[...comment]
+			};
+			c = c.concat([bdy]);
+			console.log();
+			return {
+				comments:[...c]
+			};
 			
 		case ADD_COMMENT :
-			const {id, parentId, timestamp, body, author, voteScore, deleted, parentDeleted} = action
+			const {ID, parentId, timestamp, body, author, voteScore, deleted, parentDeleted} = action
+			let d = state.comments;
+			const obj = {
+				id: ID,
+				comments:[]
+			}
 			return {
 				...state,
 				[id]: {

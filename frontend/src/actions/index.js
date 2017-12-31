@@ -27,18 +27,18 @@ export function addPost ({ id, timestamp, title, body, author, category}) {
   }
 }
 
-export function removePost ({ id, deleted }) {
+export function removePost ({id}) {
   return {
     type: REMOVE_POST,
     id,
-    deleted,
   }
 }
 
-export function initalComment (comment) {
+export function initialComment ({id, comment}) {
   return {
     type:INIT_COMMENT,
-    comment
+    id,
+    comment,
   }
 }
 
