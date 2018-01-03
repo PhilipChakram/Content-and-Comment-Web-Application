@@ -4,7 +4,7 @@ import Posts from './Posts.js'
 import './App.css';
 import { Route } from 'react-router-dom';
 import { connect } from 'react-redux'
-import { initialPost,addPost,removePost, initialComment, addComment, removeComment} from './actions'
+import { initialPost,addPost,removePost, editPost, initialComment, addComment, removeComment, editComment} from './actions'
 import serializeForm from 'form-serialize'
 import { withRouter } from 'react-router-dom'
 import { Link } from 'react-router-dom';
@@ -17,6 +17,7 @@ class App extends Component {
       filter: "",
       isEdit: false,
       isComment: false,
+      isCommentEdit:false,
   }
 
 
@@ -64,6 +65,60 @@ class App extends Component {
     this.setState({isEdit:false});
   }
 
+
+  commentEditTrue = ()=>{
+    this.setState({isCommentEdit:true});
+  }
+
+  commentEdit = (e)=> {
+    e.preventDefault()
+    this.setState({isCommentEdit:false})
+    let token = localStorage.token
+
+    
+
+    const {editComment} = this.props;
+
+    if (!token)
+      token = localStorage.token = Math.random().toString(36).substr(-8)
+
+    const values = serializeForm(e.target, { hash: true })
+    editComment(values);
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': token
+    }
+  }
+
+  changePost = (e)=>{
+    e.preventDefault()
+    let token = localStorage.token
+
+    
+
+    const {editPost} = this.props;
+
+    if (!token)
+      token = localStorage.token = Math.random().toString(36).substr(-8)
+
+    const values = serializeForm(e.target, { hash: true })
+    editPost(values);
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': token
+    }
+
+    // fetch(`http://localhost:3001/posts`, {
+    // method: 'PUT',
+    // headers: {
+    //   ...headers,
+    //   'Content-Type': 'application/json'
+    // },
+    // body: JSON.stringify(values)
+    // }).then(res => res.json())
+  }
+
+
   filterCategory = (e) => {
     this.setState({filter:e.target.innerHTML})
   }
@@ -84,6 +139,7 @@ class App extends Component {
 
   commentSubmit = (e)=>{
     e.preventDefault()
+    this.setState({isComment:false});
     let token = localStorage.token
     if (!token)
       token = localStorage.token = Math.random().toString(36).substr(-8)
@@ -132,6 +188,7 @@ class App extends Component {
     console.log("This is post state",post);
     const isEdit = this.state.isEdit;
     const isComment = this.state.isComment;
+    const isCommentEdit = this.state.isCommentEdit;
 
     console.log('Main App',post);
     return (
@@ -261,21 +318,20 @@ class App extends Component {
 
                           <button onClick={this.editTrue}>Edit</button>
                            <hr/>
-                           {isEdit && <form  id="form-data" onSubmit={this.formSubmit} ref={(form) => this.form = form} >
-                              <input type="hidden" name="id" value="17483984kjdbs3qr89" ref={(id) => this.id = id}></input>
-                              <input type="hidden" name="timestamp" value={Date.now().toString()} ref={(timeStamp) => this.timeStamp = timeStamp}></input>
+                           {isEdit && <form  id="form-data" onSubmit={this.changePost} >
+                              <input type="hidden" name="id" value={props.match.params.id} ></input>
                               <p>Author: </p>
-                              <input name="author" type="text" ref={(author) => this.author = author} defaultValue={author}></input>
+                              <input name="author" type="text"  defaultValue={author}></input>
                               <p>Title: </p>
-                              <input name="title" type="text" ref={(title) => this.title = title} defaultValue={title}></input>
+                              <input name="title" type="text"  defaultValue={title}></input>
                               <p>Category: </p>
-                                <select name="category" ref={(category) => this.category = category}>
+                                <select name="category" >
                                   <option value="react">React</option>
                                   <option value="redux">Redux</option>
                                   <option value="udacity">Udacity</option>
                                 </select>
                               <p>Body:</p>
-                              <textarea name="body" className="form-control" rows="3" required ref={(body) => this.body = body} defaultValue={body}></textarea>
+                              <textarea name="body" className="form-control" rows="3" required  defaultValue={body}></textarea>
                             <button type="submit" className="btn btn-success">Submit</button>
                           </form>}
                         </li>
@@ -309,6 +365,20 @@ class App extends Component {
                                 }).then(res => console.log(res.json()));
                                   removeComment({id, parentId});
                                 }}>Delete</button>
+                                <button onClick={this.commentEditTrue}>Edit</button>
+                                {isCommentEdit && <div>
+                                  <h4><small>Edit Comment:</small></h4>
+                                  <form onSubmit={this.commentEdit}>
+                                      <input type="hidden" name="id" value={comment.id}></input>
+                                      <input type="hidden" name="timestamp" value={Date.now()} ></input>
+                                      <input type="hidden" name="parentId" value= {props.match.params.id} ></input>
+                                      <p>Author: </p>
+                                      <input name="author" type="text" defaultValue={comment.author}></input>
+                                      <p>Body:</p>
+                                      <textarea name="body" className="form-control" rows="3" required defaultValue={comment.body} ></textarea>
+                                    <button type="submit" className="btn btn-success">Submit</button>
+                                  </form>
+                                  </div>}
                             </li>
 
                         })}
@@ -344,11 +414,14 @@ function mapStateToProps ({ posts, comment }) {
   //console.log('From Mapping State to Props', Object.entries(comment));
   let comments = [];
   Object.entries(comment).forEach(([key, value]) => {
-    comments.push(value)
+    Object.entries(value).forEach(([key, value]) => {
+          comments.push(value)
+    })
   });
-  
+  comments = comments.filter((comment)=> comment.deleted === false);
+  console.log('State Mapping',comments);
   //Reducing merging array of arrays
-  comments = [].concat.apply([],comments);
+  //comments = [].concat.apply([],comments);
   
 
   let post = []
@@ -365,9 +438,11 @@ function mapDisptachToProps (dispatch) {
     initialPost: (data) => dispatch(initialPost(data)),
     addPost: (data) => dispatch(addPost(data)),
     removePost: (data) => dispatch(removePost(data)),
+    editPost: (data) => dispatch(editPost(data)),
     initialComment: (data) => dispatch(initialComment(data)),
     addComment: (data) => dispatch(addComment(data)),
-    removeComment: (data) => dispatch(removeComment(data))
+    removeComment: (data) => dispatch(removeComment(data)),
+    editComment: (data) => dispatch(editComment(data)),
   }
 }
 

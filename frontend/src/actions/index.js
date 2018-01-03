@@ -1,11 +1,12 @@
 export const INIT_POST = 'INIT_POST'
 export const ADD_POST = 'ADD_POST'
 export const REMOVE_POST = 'REMOVE_POST'
+export const EDIT_POST = 'EDIT_POST'
 export const INIT_COMMENT = 'INIT_COMMENT'
 export const ADD_COMMENT = 'ADD_COMMENT'
 export const REMOVE_COMMENT = 'REMOVE_COMMENT'
+export const EDIT_COMMENT = 'EDIT_COMMENT'
 export const VOTE_COMMENT = 'VOTE_COMMENT'
-
 
 
 export function initialPost (posts) {
@@ -31,6 +32,17 @@ export function removePost ({id}) {
   return {
     type: REMOVE_POST,
     id,
+  }
+}
+
+export function editPost({id, title, body, author, category}) {
+  return {
+    type: EDIT_POST,
+    id,
+    title,
+    body,
+    author,
+    category,
   }
 }
 
@@ -61,6 +73,17 @@ export function removeComment ({ id, parentId }) {
     type:REMOVE_COMMENT,
     id,
     parentId,
+  }
+}
+
+export function editComment ({id, parentId, timestamp, body, author}) {
+  return {
+    type:EDIT_COMMENT,
+    id,
+    parentId,
+    timestamp,
+    body,
+    author,
   }
 }
 
