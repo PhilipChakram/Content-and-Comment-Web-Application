@@ -22,7 +22,7 @@ class Posts extends Component {
   }
   
 	render(){
-		let posts = this.props.posts.post;
+		let posts = this.props.posts;
     const filter = this.props.filter;
     const removePost = this.props.removePost;
     const modalOpen = this.state.modalOpen;

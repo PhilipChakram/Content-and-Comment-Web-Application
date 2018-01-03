@@ -56,11 +56,11 @@ export function addComment ({ id, parentId, timestamp, body, author, voteScore, 
   }
 }
 
-export function removeComment ({ id, deleted }) {
+export function removeComment ({ id, parentId }) {
   return {
     type:REMOVE_COMMENT,
     id,
-    deleted,
+    parentId,
   }
 }
 

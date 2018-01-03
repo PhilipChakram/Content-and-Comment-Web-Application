@@ -92,7 +92,9 @@ class App extends Component {
       'Accept': 'application/json',
       'Authorization': token
     }
+     const {addComment} = this.props;
 
+     addComment(values);
     // fetch(`http://localhost:3001/posts`, {
     // method: 'POST',
     // headers: {
@@ -102,6 +104,8 @@ class App extends Component {
     // body: JSON.stringify(values)
     // }).then(res => res.json())
   }
+
+  
 
   componentDidMount() {
     const url = `http://localhost:3001/categories`;
@@ -124,10 +128,8 @@ class App extends Component {
     // const posts = this.state.posts;
     // console.log(posts);
 
-    const {posts, initialPost, addPost, removePost,addComment, removeComment, comment} = this.props
-    console.log("This is comment state",comment);
-    const post = posts.post;
-    const comments = comment.comments;
+    const {post, initialPost, addPost, removePost,addComment, removeComment, comments} = this.props
+    console.log("This is post state",post);
     const isEdit = this.state.isEdit;
     const isComment = this.state.isComment;
 
@@ -164,7 +166,7 @@ class App extends Component {
 
               <a href="#" onClick={this.resetFilter}>Reset</a>
 
-              <Posts posts={posts} filter={this.state.filter} removePost={removePost} setId={this.setId}></Posts>
+              <Posts posts={post} filter={this.state.filter} removePost={removePost} setId={this.setId}></Posts>
 
               
 
@@ -200,7 +202,7 @@ class App extends Component {
 
               <a href="#" onClick={this.resetFilter}>Reset</a>
 
-              <Posts posts={posts} filter={this.state.filter} removePost={removePost} setId={this.setId}></Posts>
+              <Posts posts={post} filter={this.state.filter} removePost={removePost} setId={this.setId}></Posts>
 
               <h4>Add Post:</h4>
               <form  id="form-data" onSubmit={this.formSubmit} ref={(form) => this.form = form} >
@@ -280,40 +282,51 @@ class App extends Component {
                       })}
                     </ul> : <p>waiting</p>}
                     
+                    <h4><small>COMMENTS:</small></h4>
+                    <button onClick={this.isComment}>Add Comment</button>
                     {comments ? <ul>
-                        <h4><small>COMMENTS:</small></h4>
-                        <button onClick={this.isComment}>Add Comment</button>
-                        {comments.filter((comment)=> comment.id === props.match.params.id).map(({comments})=>{
-                          return comments.map(({id,author,body})=>{
-                            return <li key={id}>
-                              <h5><span className="glyphicon glyphicon-time"></span> Post by {author} at</h5>
-                              <p>{body}</p>
-                              <hr/>
+                        {comments.filter((comment)=> comment.parentId === props.match.params.id).map((comment,index)=>{
+                          return <li key={index}>
+                              <h5><span className="glyphicon glyphicon-time"></span> Post by {comment.author} at</h5>
+                              <p>{comment.body}</p>
+                              <button value={comment.id} onClick={(e)=>{
+                                const id = e.target.value;
+                                const parentId = comment.parentId;
+                                console.log('parentId',parentId);
+                                let token = localStorage.token
+                                if (!token)
+                                  token = localStorage.token = Math.random().toString(36).substr(-8);
+                                const headers = {
+                                  'Accept': 'application/json',
+                                  'Authorization': token
+                                };
+                                fetch(`http://localhost:3001/comments/${id}`, {
+                                  method: 'DELETE',
+                                  headers: {
+                                    ...headers,
+                                    'Content-Type': 'application/json'
+                                  },
+                                }).then(res => console.log(res.json()));
+                                  removeComment({id, parentId});
+                                }}>Delete</button>
                             </li>
-                          });
+
                         })}
                         {isComment && <div>
                           <h4><small>New Comment:</small></h4>
-                          <form onSubmit={this.formSubmit}>
+                          <form onSubmit={this.commentSubmit}>
                               <input type="hidden" name="id" value="17483984kjdbs3nys7"></input>
-                              <input type="hidden" name="timestamp" value={Date.now().toString()} ></input>
+                              <input type="hidden" name="timestamp" value={Date.now()} ></input>
                               <input type="hidden" name="parentId" value= {props.match.params.id} ></input>
                               <p>Author: </p>
                               <input name="author" type="text" ></input>
-                              <p>Title: </p>
-                              <input name="title" type="text" ></input>
-                              <p>Category: </p>
-                                <select name="category" ref={(category) => this.category = category}>
-                                  <option value="react">React</option>
-                                  <option value="redux">Redux</option>
-                                  <option value="udacity">Udacity</option>
-                                </select>
                               <p>Body:</p>
-                              <textarea name="body" className="form-control" rows="3" required ref={(body) => this.body = body}></textarea>
+                              <textarea name="body" className="form-control" rows="3" required ></textarea>
                             <button type="submit" className="btn btn-success">Submit</button>
                           </form>
                           </div> }
                       </ul> : <p>Waiting</p>}
+
 
                     <hr/>
                   </div>
@@ -328,7 +341,23 @@ class App extends Component {
 }
 
 function mapStateToProps ({ posts, comment }) {
-  return {posts, comment};
+  //console.log('From Mapping State to Props', Object.entries(comment));
+  let comments = [];
+  Object.entries(comment).forEach(([key, value]) => {
+    comments.push(value)
+  });
+  
+  //Reducing merging array of arrays
+  comments = [].concat.apply([],comments);
+  
+
+  let post = []
+  Object.entries(posts).forEach(([key, value]) => {
+    post.push(value);
+  });
+  post = post.filter((post)=> post.deleted == false);
+  console.log('State Map',post);
+  return {post, comments};
 }
 
 function mapDisptachToProps (dispatch) {

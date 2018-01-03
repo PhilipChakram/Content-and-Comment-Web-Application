@@ -21,7 +21,7 @@ console.log('fetching from url', url1);
 fetch(url1, { headers: { 'Authorization': 'whatever-you-want' }} )
    .then( (res) => res.json())
    .then((post) => {
-    store.dispatch(initialPost({post}))
+    store.dispatch(initialPost(post))
    	console.log(post)
     post.map((post)=>{
       const id = post.id;

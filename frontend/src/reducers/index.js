@@ -15,13 +15,19 @@ function posts (state = {}, action) {
 	switch (action.type) {
 		case INIT_POST :
 			const {posts} = action
-			console.log('From reducer initial state', state);
-			return posts
+			console.log('From reducer initial state', posts);
+			let y = {}; 
+			posts.map((post)=>{
+				y[post.id]=post;
+			})
+			console.log(y);
+			return y
 
 		case ADD_POST :
 			const {id, timestamp, title, body, author, category} = action
-			const dState = {
-			
+			return {
+				...state,
+				[id]:{
 					id: id,
 					timestamp: timestamp,
 					title: title,
@@ -31,27 +37,26 @@ function posts (state = {}, action) {
 					voteScore: 1,
 					deleted: false,
 					commentCount: 0,
-			}
-			console.log('From addPost',state.post);
-			let b = state.post;
-			b = b.concat([dState]);
-			return {
-				post:[...b]
+				}
 			}
 
 		case REMOVE_POST :
 			const ID = action.id;
-			let a = state.post;
-			a = a.map((post) => {
-				if(post.id === ID)
-					post.deleted = true;
-				return post;
-			})
-			a = a.filter((post)=> post.deleted === false)
+			
 
-			console.log(a);
+			console.log('Remove Post',{
+				...state,
+				[ID]:{
+					...state[ID],
+					deleted:true
+				}
+			});
 			return {
-				post:[...a]
+				...state,
+				[ID]:{
+					...state[ID],
+					deleted:true
+				}
 			}
 
 		default :
@@ -59,53 +64,63 @@ function posts (state = {}, action) {
 	}
 }
 
-function comment (state = {comments:[]}, action) {
+function comment (state = {}, action) {
+	let obj=[];
 	switch(action.type) {
 		case INIT_COMMENT :
 			const {id, comment } = action;
 			console.log("Comment reducer", id, comment);
 			console.log("State", state);
-			let c = state.comments;
+			//let c = state.comments;
 			const bdy = {
-				id:id,
-				comments:[...comment]
+				[id]:[...comment]
 			};
-			c = c.concat([bdy]);
-			console.log();
+			//c = c.concat([bdy]);
+			//console.log();
 			return {
-				comments:[...c]
+				...state,
+				...bdy,
 			};
 			
 		case ADD_COMMENT :
-			const {ID, parentId, timestamp, body, author, voteScore, deleted, parentDeleted} = action
-			let d = state.comments;
-			const obj = {
-				id: ID,
-				comments:[]
-			}
+			const {parentId, timestamp, body, author, voteScore, deleted, parentDeleted} = action
+			const ID = action.id;
+			console.log('Add comment',state[parentId]);
+			obj = state[parentId];
+			
 			return {
 				...state,
-				[id]: {
-					id,
-					parentId,
-					timestamp,
-	    			body,
-	    			author,
-	    			voteScore,
-	    			deleted,
-	    			parentDeleted,
-				}
-			}
+				[parentId]: obj ? obj.concat([{
+					id: ID,
+				    parentId: parentId,
+				    timestamp: timestamp,
+				    body: body,
+				    author: author,
+				    voteScore: 1,
+				    deleted: false,
+				    parentDeleted: false
+				}]) : [{
+					id: ID,
+				    parentId: parentId,
+				    timestamp: timestamp,
+				    body: body,
+				    author: author,
+				    voteScore: 1,
+				    deleted: false,
+				    parentDeleted: false
+				}]
+			};
 
-		// case REMOVE_COMMENT :
-		// 	const {id, deleted} = action
-		// 	return {
-		// 		...state,
-		// 		[id]: {
-		// 			...state[id],
-		// 			deleted: deleted,
-		// 		}
-		// 	}
+		case REMOVE_COMMENT :
+			const Id = action.id;
+			const pId = action.parentId;
+			obj = state[pId];
+			obj = obj.filter((comment) => comment.id !== Id);
+			console.log('Deleted Object',obj);
+			return {
+				...state,
+				[pId]: obj 
+			}
 
 		default :
 			return state
