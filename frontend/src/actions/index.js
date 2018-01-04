@@ -96,12 +96,11 @@ export function votePost ({id, voteScore}) {
   }
 }
 
-export function voteComment ({category, post, comment, vote}) {
+export function voteComment ({parentId, id, voteScore}) {
   return {
     type:VOTE_COMMENT,
-    category,
-    post,
-    comment,
-    vote,
+    id,
+    parentId,
+    voteScore,
   }
 }

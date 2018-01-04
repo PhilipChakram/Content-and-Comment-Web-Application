@@ -4,7 +4,7 @@ import Posts from './Posts.js'
 import './App.css';
 import { Route } from 'react-router-dom';
 import { connect } from 'react-redux'
-import { initialPost,addPost,removePost, editPost, votePost, initialComment, addComment, removeComment, editComment} from './actions'
+import { initialPost,addPost,removePost, editPost, votePost, initialComment, addComment, removeComment, editComment, voteComment} from './actions'
 import serializeForm from 'form-serialize'
 import { withRouter } from 'react-router-dom'
 import { Link } from 'react-router-dom';
@@ -184,7 +184,7 @@ class App extends Component {
     // const posts = this.state.posts;
     // console.log(posts);
 
-    const {post, initialPost, addPost, removePost, votePost, addComment, removeComment, comments} = this.props
+    const {post, initialPost, addPost, removePost, votePost, addComment, removeComment, voteComment, comments} = this.props
     console.log("This is post state",post);
     const isEdit = this.state.isEdit;
     const isComment = this.state.isComment;
@@ -353,7 +353,17 @@ class App extends Component {
                           return <li key={index}>
                               <h5><span className="glyphicon glyphicon-time"></span> Post by {comment.author} at</h5>
                               <p>{comment.body}</p>
-                              <p>{comment.voteScore} likes     <button>Like</button><button>Dislike</button></p>
+                              <p>{comment.voteScore} likes     <button value="like" onClick={(e)=>{
+                                    const voteScore = e.target.value;
+                                    const id = comment.id;
+                                    const parentId = comment.parentId;
+                                    voteComment({id, parentId, voteScore});
+                                }}>Like</button><button value="disLike" onClick={(e)=>{
+                                    const voteScore = e.target.value;
+                                    const id = comment.id;
+                                    const parentId = comment.parentId;
+                                    voteComment({id, parentId, voteScore});
+                                }}>Dislike</button></p>
                               <button value={comment.id} onClick={(e)=>{
                                 const id = e.target.value;
                                 const parentId = comment.parentId;
@@ -453,6 +463,7 @@ function mapDisptachToProps (dispatch) {
     addComment: (data) => dispatch(addComment(data)),
     removeComment: (data) => dispatch(removeComment(data)),
     editComment: (data) => dispatch(editComment(data)),
+    voteComment: (data) => dispatch(voteComment(data)),
   }
 }
 

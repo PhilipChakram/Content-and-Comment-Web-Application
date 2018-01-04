@@ -230,6 +230,29 @@ function comment (state = {}, action) {
 					}
 				}
 			}
+		case VOTE_COMMENT :
+			if(action.voteScore === 'like')
+			return {
+				...state,
+				[action.parentId]:{
+					...state[action.parentId],
+					[action.id]:{
+						...state[action.parentId][action.id],
+					    voteScore:state[action.parentId][action.id].voteScore + 1,
+					}
+				}
+			};
+			else if(action.voteScore === 'disLike')
+			return {
+				...state,
+				[action.parentId]:{
+					...state[action.parentId],
+					[action.id]:{
+						...state[action.parentId][action.id],
+					    voteScore:state[action.parentId][action.id].voteScore - 1,
+					}
+				}
+			};
 
 		default :
 			return state
