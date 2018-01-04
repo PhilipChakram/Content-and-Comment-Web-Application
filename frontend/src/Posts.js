@@ -20,6 +20,8 @@ class Posts extends Component {
       modalOpen: false
     }))
   }
+
+
   
 	render(){
 		let posts = this.props.posts;
@@ -27,6 +29,7 @@ class Posts extends Component {
     const removePost = this.props.removePost;
     const modalOpen = this.state.modalOpen;
     const setId = this.props.setId;
+    const votePost = this.props.votePost;
 
     posts = filter ? posts.filter((post,index)=> post.category === filter) : posts;
     console.log(Date.now().toString());
@@ -35,12 +38,19 @@ class Posts extends Component {
 			       <h4><small>RECENT POSTS</small></h4>
               <hr/>
               {posts ? <ul name="Ul" onClick={this.openFoodModal}>
-                {posts.map(({id,timestamp,author,body,title,category},index)=>{
+                {posts.map(({id,timestamp,author,body,title,category,voteScore},index)=>{
                   return <li key={id} value={id}>
                     <a href="#"><h2>{title}</h2></a>
                     <h5><span className="glyphicon glyphicon-time"></span> Post by {author} at</h5>
                     <h5><span className="label label-success">{category}</span></h5><br/>
                     <p>{body}</p>
+                    <p>{voteScore} likes  <button value="like" onClick={(e)=>{
+                        const voteScore = e.target.value;
+                        votePost({id, voteScore});
+                    }}>Like</button><button value="disLike" onClick={(e)=>{
+                        const voteScore = e.target.value;
+                        votePost({id, voteScore});
+                    }}>Dislike</button></p>
                     {modalOpen && <button value={id} onClick={(e)=>{
                       const id = e.target.value;
                       let token = localStorage.token

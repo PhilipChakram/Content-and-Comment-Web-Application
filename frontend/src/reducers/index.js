@@ -5,6 +5,7 @@ import {
   ADD_POST,
   REMOVE_POST,
   EDIT_POST,
+  VOTE_POST,
   INIT_COMMENT,
   ADD_COMMENT,
   EDIT_COMMENT,
@@ -87,6 +88,28 @@ function posts (state = {}, action) {
 				}
 			}
 
+		case VOTE_POST :
+			if(action.voteScore === 'like')
+			{
+				return {
+					...state,
+					[action.id]:{
+						...state[action.id],
+						voteScore:state[action.id].voteScore + 1,
+					}
+				};
+			}
+			else if(action.voteScore === 'disLike')
+			{
+				return {
+					...state,
+					[action.id]:{
+						...state[action.id],
+						voteScore:state[action.id].voteScore - 1,
+					}
+				};
+			}
+			
 		default :
 			return state
 	}

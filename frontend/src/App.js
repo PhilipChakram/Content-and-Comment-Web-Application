@@ -4,7 +4,7 @@ import Posts from './Posts.js'
 import './App.css';
 import { Route } from 'react-router-dom';
 import { connect } from 'react-redux'
-import { initialPost,addPost,removePost, editPost, initialComment, addComment, removeComment, editComment} from './actions'
+import { initialPost,addPost,removePost, editPost, votePost, initialComment, addComment, removeComment, editComment} from './actions'
 import serializeForm from 'form-serialize'
 import { withRouter } from 'react-router-dom'
 import { Link } from 'react-router-dom';
@@ -184,11 +184,12 @@ class App extends Component {
     // const posts = this.state.posts;
     // console.log(posts);
 
-    const {post, initialPost, addPost, removePost,addComment, removeComment, comments} = this.props
+    const {post, initialPost, addPost, removePost, votePost, addComment, removeComment, comments} = this.props
     console.log("This is post state",post);
     const isEdit = this.state.isEdit;
     const isComment = this.state.isComment;
     const isCommentEdit = this.state.isCommentEdit;
+
 
     console.log('Main App',post);
     return (
@@ -223,7 +224,7 @@ class App extends Component {
 
               <a href="#" onClick={this.resetFilter}>Reset</a>
 
-              <Posts posts={post} filter={this.state.filter} removePost={removePost} setId={this.setId}></Posts>
+              <Posts posts={post} filter={this.state.filter} removePost={removePost} setId={this.setId} votePost={votePost}></Posts>
 
               
 
@@ -259,7 +260,7 @@ class App extends Component {
 
               <a href="#" onClick={this.resetFilter}>Reset</a>
 
-              <Posts posts={post} filter={this.state.filter} removePost={removePost} setId={this.setId}></Posts>
+              <Posts posts={post} filter={this.state.filter} removePost={removePost} setId={this.setId} votePost={votePost}></Posts>
 
               <h4>Add Post:</h4>
               <form  id="form-data" onSubmit={this.formSubmit} ref={(form) => this.form = form} >
@@ -291,12 +292,19 @@ class App extends Component {
                    <h4><small>RECENT POSTS</small></h4>
                     <hr/>
                     {post ? <ul name="Ul" onClick={this.openFoodModal}>
-                      {post.filter((post)=> post.id === props.match.params.id).map(({id,timestamp,author,body,title,category},index)=>{
+                      {post.filter((post)=> post.id === props.match.params.id).map(({id,timestamp,author,body,title,category, voteScore},index)=>{
                         return <li key={id} value={id}>
                           <a href="#"><h2>{title}</h2></a>
                           <h5><span className="glyphicon glyphicon-time"></span> Post by {author} at</h5>
                           <h5><span className="label label-success">{category}</span></h5><br/>
                           <p>{body}</p>
+                          <p>{voteScore} likes     <button value="like" onClick={(e)=>{
+                                const voteScore = e.target.value;
+                                votePost({id, voteScore});
+                            }}>Like</button><button value="disLike" onClick={(e)=>{
+                                const voteScore = e.target.value;
+                                votePost({id, voteScore});
+                            }}>Dislike</button></p>
                           <button value={id} onClick={(e)=>{
                             const id = e.target.value;
                             let token = localStorage.token
@@ -345,6 +353,7 @@ class App extends Component {
                           return <li key={index}>
                               <h5><span className="glyphicon glyphicon-time"></span> Post by {comment.author} at</h5>
                               <p>{comment.body}</p>
+                              <p>{comment.voteScore} likes     <button>Like</button><button>Dislike</button></p>
                               <button value={comment.id} onClick={(e)=>{
                                 const id = e.target.value;
                                 const parentId = comment.parentId;
@@ -439,6 +448,7 @@ function mapDisptachToProps (dispatch) {
     addPost: (data) => dispatch(addPost(data)),
     removePost: (data) => dispatch(removePost(data)),
     editPost: (data) => dispatch(editPost(data)),
+    votePost: (data) => dispatch(votePost(data)),
     initialComment: (data) => dispatch(initialComment(data)),
     addComment: (data) => dispatch(addComment(data)),
     removeComment: (data) => dispatch(removeComment(data)),

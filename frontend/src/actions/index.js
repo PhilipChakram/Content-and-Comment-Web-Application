@@ -2,6 +2,7 @@ export const INIT_POST = 'INIT_POST'
 export const ADD_POST = 'ADD_POST'
 export const REMOVE_POST = 'REMOVE_POST'
 export const EDIT_POST = 'EDIT_POST'
+export const VOTE_POST = 'VOTE_POST'
 export const INIT_COMMENT = 'INIT_COMMENT'
 export const ADD_COMMENT = 'ADD_COMMENT'
 export const REMOVE_COMMENT = 'REMOVE_COMMENT'
@@ -84,6 +85,14 @@ export function editComment ({id, parentId, timestamp, body, author}) {
     timestamp,
     body,
     author,
+  }
+}
+
+export function votePost ({id, voteScore}) {
+  return {
+    type:VOTE_POST,
+    id,
+    voteScore,
   }
 }
 
