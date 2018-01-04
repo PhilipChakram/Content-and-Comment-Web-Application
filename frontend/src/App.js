@@ -43,7 +43,7 @@ class App extends Component {
     console.log('Add Form Values',values);
     const headers = {
       'Accept': 'application/json',
-      'Authorization': token
+      'Authorization': 'whatever-you-want'
     }
 
     fetch(`http://localhost:3001/posts`, {
@@ -88,6 +88,14 @@ class App extends Component {
       'Accept': 'application/json',
       'Authorization': token
     }
+    fetch(`http://localhost:3001/comments/${values.id}`, {
+    method: 'PUT',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(values)
+    }).then(res => res.json())
   }
 
   changePost = (e)=>{
@@ -105,17 +113,17 @@ class App extends Component {
     editPost(values);
     const headers = {
       'Accept': 'application/json',
-      'Authorization': token
+      'Authorization': 'whatever-you-want'
     }
 
-    // fetch(`http://localhost:3001/posts`, {
-    // method: 'PUT',
-    // headers: {
-    //   ...headers,
-    //   'Content-Type': 'application/json'
-    // },
-    // body: JSON.stringify(values)
-    // }).then(res => res.json())
+    fetch(`http://localhost:3001/posts/${values.id}`, {
+    method: 'PUT',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(values)
+    }).then(res => res.json())
   }
 
 
@@ -146,19 +154,19 @@ class App extends Component {
     const values = serializeForm(e.target, { hash: true })
     const headers = {
       'Accept': 'application/json',
-      'Authorization': token
+      'Authorization': 'whatever-you-want'
     }
      const {addComment} = this.props;
 
      addComment(values);
-    // fetch(`http://localhost:3001/posts`, {
-    // method: 'POST',
-    // headers: {
-    //   ...headers,
-    //   'Content-Type': 'application/json'
-    // },
-    // body: JSON.stringify(values)
-    // }).then(res => res.json())
+    fetch(`http://localhost:3001/comments`, {
+    method: 'POST',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(values)
+    }).then(res => res.json())
   }
 
   
@@ -264,8 +272,8 @@ class App extends Component {
 
               <h4>Add Post:</h4>
               <form  id="form-data" onSubmit={this.formSubmit} ref={(form) => this.form = form} >
-                  <input type="hidden" name="id" value="17483984kjdbs3qr89" ref={(id) => this.id = id}></input>
-                  <input type="hidden" name="timestamp" value={Date.now().toString()} ref={(timeStamp) => this.timeStamp = timeStamp}></input>
+                  <input type="hidden" name="id" value={Math.random().toString(36).substr(-8)} ref={(id) => this.id = id}></input>
+                  <input type="hidden" name="timestamp" value={Date.now()} ref={(timeStamp) => this.timeStamp = timeStamp}></input>
                   <p>Author: </p>
                   <input name="author" type="text" ref={(author) => this.author = author}></input>
                   <p>Title: </p>
@@ -373,7 +381,7 @@ class App extends Component {
                                   token = localStorage.token = Math.random().toString(36).substr(-8);
                                 const headers = {
                                   'Accept': 'application/json',
-                                  'Authorization': token
+                                  'Authorization': 'whatever-you-want'
                                 };
                                 fetch(`http://localhost:3001/comments/${id}`, {
                                   method: 'DELETE',
@@ -404,7 +412,7 @@ class App extends Component {
                         {isComment && <div>
                           <h4><small>New Comment:</small></h4>
                           <form onSubmit={this.commentSubmit}>
-                              <input type="hidden" name="id" value="17483984kjdbs3nys7"></input>
+                              <input type="hidden" name="id" value={Math.random().toString(36).substr(-8)}></input>
                               <input type="hidden" name="timestamp" value={Date.now()} ></input>
                               <input type="hidden" name="parentId" value= {props.match.params.id} ></input>
                               <p>Author: </p>

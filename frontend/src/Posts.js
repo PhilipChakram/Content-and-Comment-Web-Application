@@ -58,7 +58,7 @@ class Posts extends Component {
                         token = localStorage.token = Math.random().toString(36).substr(-8);
                       const headers = {
                         'Accept': 'application/json',
-                        'Authorization': token
+                        'Authorization': 'whatever-you-want'
                       };
                       fetch(`http://localhost:3001/posts/${id}`, {
                         method: 'DELETE',
