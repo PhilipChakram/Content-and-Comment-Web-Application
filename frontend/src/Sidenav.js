@@ -8,7 +8,7 @@ class Sidenav extends Component {
 		return(
 			     <div className="col-sm-3 sidenav">
 
-              <h4>Johns Blog</h4>
+              <h4>Philips Blog</h4>
               <ul className="nav nav-pills nav-stacked">
                   {data.map(({name},index)=>{
                     return <li key={index}><a href="#" key={index}>{name}</a></li>

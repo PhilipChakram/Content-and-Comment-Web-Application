@@ -20,32 +20,16 @@ class App extends Component {
       isCommentEdit:false,
   }
 
-
-  addPost = () => {
-    const id = '8xf0y6ziyjabvozdd253nd';
-    const timestamp = Date.now();
-    
-  }
-
   formSubmit = (e) => {
-    e.preventDefault()
-    let token = localStorage.token
-
-    
-
-    const {addPost} = this.props;
-
-    if (!token)
-      token = localStorage.token = Math.random().toString(36).substr(-8)
-
-    const values = serializeForm(e.target, { hash: true })
+    e.preventDefault();
+    const {addPost} = this.props;    
+    const values = serializeForm(e.target, { hash: true });
     addPost(values);
     console.log('Add Form Values',values);
     const headers = {
       'Accept': 'application/json',
       'Authorization': 'whatever-you-want'
-    }
-
+    };
     fetch(`http://localhost:3001/posts`, {
     method: 'POST',
     headers: {
@@ -53,8 +37,7 @@ class App extends Component {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(values)
-    }).then(res => res.json())
-  
+    }).then(res => res.json());
   }
 
   editTrue = ()=> {
@@ -71,23 +54,16 @@ class App extends Component {
   }
 
   commentEdit = (e)=> {
-    e.preventDefault()
-    this.setState({isCommentEdit:false})
-    let token = localStorage.token
-
-    
-
+    e.preventDefault();
+    this.setState({isCommentEdit:false});
     const {editComment} = this.props;
-
-    if (!token)
-      token = localStorage.token = Math.random().toString(36).substr(-8)
-
-    const values = serializeForm(e.target, { hash: true })
+    const values = serializeForm(e.target, { hash: true });
     editComment(values);
     const headers = {
       'Accept': 'application/json',
-      'Authorization': token
-    }
+      'Authorization': 'whatever-you-want'
+    };
+    console.log('commentEdit',values);
     fetch(`http://localhost:3001/comments/${values.id}`, {
     method: 'PUT',
     headers: {
@@ -95,27 +71,18 @@ class App extends Component {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(values)
-    }).then(res => res.json())
+    }).then(res => res.json());
   }
 
   changePost = (e)=>{
-    e.preventDefault()
-    let token = localStorage.token
-
-    
-
+    e.preventDefault();
     const {editPost} = this.props;
-
-    if (!token)
-      token = localStorage.token = Math.random().toString(36).substr(-8)
-
-    const values = serializeForm(e.target, { hash: true })
+    const values = serializeForm(e.target, { hash: true });
     editPost(values);
     const headers = {
       'Accept': 'application/json',
       'Authorization': 'whatever-you-want'
-    }
-
+    };
     fetch(`http://localhost:3001/posts/${values.id}`, {
     method: 'PUT',
     headers: {
@@ -123,12 +90,12 @@ class App extends Component {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(values)
-    }).then(res => res.json())
+    }).then(res => res.json());
   }
 
 
   filterCategory = (e) => {
-    this.setState({filter:e.target.innerHTML})
+    this.setState({filter:e.target.innerHTML});
   }
 
   setId = (id,e) => {
@@ -141,23 +108,19 @@ class App extends Component {
   }
 
   isComment = ()=> {
-    console.log("is comment called")
+    console.log("is comment called");
     this.setState({isComment:true});
   }
 
   commentSubmit = (e)=>{
-    e.preventDefault()
+    e.preventDefault();
     this.setState({isComment:false});
-    let token = localStorage.token
-    if (!token)
-      token = localStorage.token = Math.random().toString(36).substr(-8)
-    const values = serializeForm(e.target, { hash: true })
+    const values = serializeForm(e.target, { hash: true });
     const headers = {
       'Accept': 'application/json',
       'Authorization': 'whatever-you-want'
-    }
+    };
      const {addComment} = this.props;
-
      addComment(values);
     fetch(`http://localhost:3001/comments`, {
     method: 'POST',
@@ -166,10 +129,8 @@ class App extends Component {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(values)
-    }).then(res => res.json())
+    }).then(res => res.json());
   }
-
-  
 
   componentDidMount() {
     const url = `http://localhost:3001/categories`;
@@ -177,12 +138,6 @@ class App extends Component {
     fetch(url, { headers: { 'Authorization': 'whatever-you-want' }} )
       .then( (res) => res.json())
       .then(({categories}) =>  this.setState({category:categories}));
-
-    // const url1 = `http://localhost:3001/posts`;
-    // console.log('fetching from url', url1);
-    // fetch(url1, { headers: { 'Authorization': 'whatever-you-want' }} )
-    //   .then( (res) => res.json())
-    //   .then((post) => this.setState({posts:post}));
   }
 
   render() {
@@ -205,95 +160,53 @@ class App extends Component {
         <div className="container-fluid">
           <div className="row content">
 
+            
+
             <Route exact path="/" render = {() => (
-                  <div> 
-              <div className="col-sm-3 sidenav">
+              <div> 
+                <div className="col-sm-3 sidenav">
+                  <h4>Philips Blog</h4>
+                  <ul className="nav nav-pills nav-stacked" onClick={this.filterCategory}>
+                      {data.map(({name},index)=>{
+                        return <li key={name}><a href="#" key={index}>{name}</a></li>
+                      })}
+                  </ul><br/>
 
-              <h4>Johns Blog</h4>
-              <ul className="nav nav-pills nav-stacked" onClick={this.filterCategory}>
-                  {data.map(({name},index)=>{
-                    return <li key={name}><a href="#" key={index}>{name}</a></li>
-                  })}
-              </ul><br/>
+                  <div className="input-group">
+                    <input type="text" className="form-control" placeholder="Search Blog.."></input>
+                    <span className="input-group-btn">
+                      <button className="btn btn-default" type="button">
+                        <span className="glyphicon glyphicon-search"></span>
+                      </button>
+                    </span>
+                  </div>
 
-              <div className="input-group">
-                <input type="text" className="form-control" placeholder="Search Blog.."></input>
-                <span className="input-group-btn">
-                  <button className="btn btn-default" type="button">
-                    <span className="glyphicon glyphicon-search"></span>
-                  </button>
-                </span>
-              </div>
+                </div>
 
-            </div>
-
-
-            <div className="col-sm-9">
-
-              <a href="#" onClick={this.resetFilter}>Reset</a>
-
-              <Posts posts={post} filter={this.state.filter} removePost={removePost} setId={this.setId} votePost={votePost}></Posts>
-
-              
-
-              
-            </div>
-            </div>
-                )}/>
-
-            <Route exact path="/posts" render = {() => (
-                  <div> 
-              <div className="col-sm-3 sidenav">
-
-              <h4>Johns Blog</h4>
-              <ul className="nav nav-pills nav-stacked" onClick={this.filterCategory}>
-                  {data.map(({name},index)=>{
-                    return <li key={name}><a href="#" key={index}>{name}</a></li>
-                  })}
-              </ul><br/>
-
-              <div className="input-group">
-                <input type="text" className="form-control" placeholder="Search Blog.."></input>
-                <span className="input-group-btn">
-                  <button className="btn btn-default" type="button">
-                    <span className="glyphicon glyphicon-search"></span>
-                  </button>
-                </span>
-              </div>
-
-            </div>
-
-
-            <div className="col-sm-9">
-
-              <a href="#" onClick={this.resetFilter}>Reset</a>
-
-              <Posts posts={post} filter={this.state.filter} removePost={removePost} setId={this.setId} votePost={votePost}></Posts>
-
-              <h4>Add Post:</h4>
-              <form  id="form-data" onSubmit={this.formSubmit} ref={(form) => this.form = form} >
-                  <input type="hidden" name="id" value={Math.random().toString(36).substr(-8)} ref={(id) => this.id = id}></input>
-                  <input type="hidden" name="timestamp" value={Date.now()} ref={(timeStamp) => this.timeStamp = timeStamp}></input>
-                  <p>Author: </p>
-                  <input name="author" type="text" ref={(author) => this.author = author}></input>
-                  <p>Title: </p>
-                  <input name="title" type="text" ref={(title) => this.title = title}></input>
-                  <p>Category: </p>
-                    <select name="category" ref={(category) => this.category = category}>
-                      <option value="react">React</option>
-                      <option value="redux">Redux</option>
-                      <option value="udacity">Udacity</option>
-                    </select>
-                  <p>Body:</p>
-                  <textarea name="body" className="form-control" rows="3" required ref={(body) => this.body = body}></textarea>
-                <button type="submit" className="btn btn-success">Submit</button>
-              </form>
-              <br/><br/>
-
-              
-            </div>
-            </div>
-                )}/>
+                <div className="col-sm-9">
+                  <a href="#" onClick={this.resetFilter}>Reset</a>
+                  <Posts posts={post} filter={this.state.filter} removePost={removePost} setId={this.setId} votePost={votePost}></Posts>
+                  <h4>Add Post:</h4>
+                  <form  id="form-data" onSubmit={this.formSubmit} ref={(form) => this.form = form} >
+                      <input type="hidden" name="id" value={Math.random().toString(36).substr(-10)} ref={(id) => this.id = id}></input>
+                      <input type="hidden" name="timestamp" value={Date.now()} ref={(timeStamp) => this.timeStamp = timeStamp}></input>
+                      <p>Author: </p>
+                      <input name="author" type="text" ref={(author) => this.author = author}></input>
+                      <p>Title: </p>
+                      <input name="title" type="text" ref={(title) => this.title = title}></input>
+                      <p>Category: </p>
+                        <select name="category" ref={(category) => this.category = category}>
+                          <option value="react">React</option>
+                          <option value="redux">Redux</option>
+                          <option value="udacity">Udacity</option>
+                        </select>
+                      <p>Body:</p>
+                      <textarea name="body" className="form-control" rows="3" required ref={(body) => this.body = body}></textarea>
+                    <button type="submit" className="btn btn-success">Submit</button>
+                  </form>
+                  <br/><br/>
+                </div>
+               </div>)}/>
 
             <Route path="/posts/:id" render = {(props) => (
                   <div>
@@ -308,10 +221,38 @@ class App extends Component {
                           <p>{body}</p>
                           <p>{voteScore} likes     <button value="like" onClick={(e)=>{
                                 const voteScore = e.target.value;
+                                const values = {option:'upVote'}
+                                
                                 votePost({id, voteScore});
-                            }}>Like</button><button value="disLike" onClick={(e)=>{
+                                const headers = {
+                                  'Accept': 'application/json',
+                                  'Authorization': 'whatever-you-want'
+                                }
+                                fetch(`http://localhost:3001/posts/${id}`, {
+                                  method: 'POST',
+                                  headers: {
+                                    ...headers,
+                                    'Content-Type': 'application/json'
+                                  },
+                                  body: JSON.stringify(values)
+                                  }).then(res => res.json())
+                            }}>Like</button>
+                            <button value="disLike" onClick={(e)=>{
                                 const voteScore = e.target.value;
                                 votePost({id, voteScore});
+                                const values = {option:'downVote'}
+                                const headers = {
+                                  'Accept': 'application/json',
+                                  'Authorization': 'whatever-you-want'
+                                }
+                                fetch(`http://localhost:3001/posts/${id}`, {
+                                  method: 'POST',
+                                  headers: {
+                                    ...headers,
+                                    'Content-Type': 'application/json'
+                                  },
+                                  body: JSON.stringify(values)
+                                  }).then(res => res.json())
                             }}>Dislike</button></p>
                           <button value={id} onClick={(e)=>{
                             const id = e.target.value;
@@ -365,12 +306,42 @@ class App extends Component {
                                     const voteScore = e.target.value;
                                     const id = comment.id;
                                     const parentId = comment.parentId;
+                                    const values = {option:'upVote'}
+                                
+                                    const headers = {
+                                      'Accept': 'application/json',
+                                      'Authorization': 'whatever-you-want'
+                                    }
                                     voteComment({id, parentId, voteScore});
-                                }}>Like</button><button value="disLike" onClick={(e)=>{
+                                    fetch(`http://localhost:3001/comments/${id}`, {
+                                      method: 'POST',
+                                      headers: {
+                                        ...headers,
+                                        'Content-Type': 'application/json'
+                                      },
+                                      body: JSON.stringify(values)
+                                      }).then(res => res.json())
+
+                                }}>Like</button>
+                                <button value="disLike" onClick={(e)=>{
                                     const voteScore = e.target.value;
                                     const id = comment.id;
                                     const parentId = comment.parentId;
                                     voteComment({id, parentId, voteScore});
+                                    const values = {option:'downVote'}
+                                
+                                    const headers = {
+                                      'Accept': 'application/json',
+                                      'Authorization': 'whatever-you-want'
+                                    }
+                                    fetch(`http://localhost:3001/comments/${id}`, {
+                                      method: 'POST',
+                                      headers: {
+                                        ...headers,
+                                        'Content-Type': 'application/json'
+                                      },
+                                      body: JSON.stringify(values)
+                                      }).then(res => res.json())
                                 }}>Dislike</button></p>
                               <button value={comment.id} onClick={(e)=>{
                                 const id = e.target.value;
