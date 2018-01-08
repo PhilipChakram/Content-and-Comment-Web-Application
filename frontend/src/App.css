@@ -19,9 +19,10 @@ ul {
     z-index: 1;
     top: 0;
     left: 0;
-    background-color: #111;
+    background-color: #f1f1f1;
     overflow-x: hidden;
 }
+
 
 .modal {
   position: absolute;
@@ -57,12 +58,22 @@ ul {
     display: block;
 }
 
+ul li{
+  padding: 16px;
+  text-decoration: none;
+  display: block;
+  color: black;
+}
+
 ul li:hover {
-        background: #1c1c1c;
+        background: #DEEEF4;
     }
+
+
+
 /* Change color on hover */
 .sidenav a:hover {
-    background-color: #ddd;
+    background: #1c1c1c;
     color: black;
 }
 

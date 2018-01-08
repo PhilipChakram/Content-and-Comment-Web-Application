@@ -18,12 +18,10 @@ function posts (state = {}, action) {
 	switch (action.type) {
 		case INIT_POST :
 			const {posts} = action
-			console.log('From reducer initial state', posts);
 			let y = {}; 
 			posts.map((post)=>{
 				y[post.id]=post;
 			})
-			console.log(y);
 			return Object.keys(state).length === 0 ? y : state
 
 		case ADD_POST :
@@ -45,15 +43,6 @@ function posts (state = {}, action) {
 
 		case REMOVE_POST :
 			const ID = action.id;
-			
-
-			console.log('Remove Post',{
-				...state,
-				[ID]:{
-					...state[ID],
-					deleted:true
-				}
-			});
 			return {
 				...state,
 				[ID]:{
@@ -63,19 +52,6 @@ function posts (state = {}, action) {
 			}
 
 		case EDIT_POST :
-
-			console.log('From Edit Post',{
-				...state,
-				[action.id]:{
-					...state[action.id],
-					id:action.id,
-					title:action.title,
-					body:action.body,
-					author:action.author,
-					category:action.category,
-				}
-			})
-
 			return {
 				...state,
 				[action.id]:{
@@ -120,48 +96,20 @@ function comment (state = {}, action) {
 	switch(action.type) {
 		case INIT_COMMENT :
 			const {id, comment } = action;
-			//console.log("Comment reducer", id, comment);
 			let z = {}; 
 			comment.map((c)=>{
 				z[c.id]=c;
 			})
 
-			console.log("Comment reducer", {
-				...state,
-				[id]:{...z}
-			});
-			//let c = state.comments;
-			
-			//c = c.concat([bdy]);
-			//console.log();
 			return {
 				...state,
 				[id]:{...z}
 			};
 			
 		case ADD_COMMENT :
-			const {parentId, timestamp, body, author, voteScore, deleted, parentDeleted} = action
+			const {parentId, timestamp, body, author} = action
 			const ID = action.id;
-			console.log('Add comment',state[parentId]);
-			obj = state[parentId];
-
-			console.log({
-				...state,
-				[parentId]:{
-						...state[parentId],
-						[ID]:{
-						id: ID,
-					    parentId: parentId,
-					    timestamp: timestamp,
-					    body: body,
-					    author: author,
-					    voteScore: 1,
-					    deleted: false,
-					    parentDeleted: false
-					}
-				}
-			})
-			
+			obj = state[parentId];			
 			return {
 				...state,
 				[parentId]:{
@@ -182,18 +130,7 @@ function comment (state = {}, action) {
 		case REMOVE_COMMENT :
 			const Id = action.id;
 			const pId = action.parentId;
-			// obj = state[pId];
-			// obj = obj.filter((comment) => comment.id !== Id);
-			 console.log('Deleted Object',{
-				...state,
-				[pId]: {
-					...state[pId],
-					[Id]:{
-						...state[pId][Id],
-						deleted:true
-					}
-				} 
-			});
+
 			return {
 				...state,
 				[pId]: {
@@ -206,18 +143,6 @@ function comment (state = {}, action) {
 			}
 
 		case EDIT_COMMENT :
-			console.log('Edit Comment',{
-				...state,
-				[action.parentId]:{
-					...state[action.parentId],
-					[action.id]:{
-						...state[action.parentId][action.id],
-					    timestamp: action.timestamp,
-					    body: action.body,
-					    author: action.author,
-					}
-				}
-			});
 			return {
 				...state,
 				[action.parentId]:{

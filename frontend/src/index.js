@@ -17,16 +17,13 @@ const store = createStore(
 )
 
 const url1 = `http://localhost:3001/posts`;
-console.log('fetching from url', url1);
 fetch(url1, { headers: { 'Authorization': 'whatever-you-want' }} )
    .then( (res) => res.json())
    .then((post) => {
     store.dispatch(initialPost(post))
-   	console.log(post)
     post.map((post)=>{
       const id = post.id;
       const url2 = `http://localhost:3001/posts/${id}/comments`;
-      console.log('fetching from url', url2);
       fetch(url2, { headers: { 'Authorization': 'whatever-you-want' }} )
         .then( (res) => res.json())
         .then((comment) => {

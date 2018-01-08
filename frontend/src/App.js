@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
-import Sidenav from './Sidenav.js'
-import Posts from './Posts.js'
+import Sidenav from './Sidenav.js';
+import Posts from './Posts.js';
+import AddPost from './AddPost.js';
+import Comments from './Comments.js';
+import SinglePost from './SinglePost.js'
 import './App.css';
 import { Route } from 'react-router-dom';
-import { connect } from 'react-redux'
-import { initialPost,addPost,removePost, editPost, votePost, initialComment, addComment, removeComment, editComment, voteComment} from './actions'
-import serializeForm from 'form-serialize'
-import { withRouter } from 'react-router-dom'
+import { connect } from 'react-redux';
+import { initialPost,addPost,removePost, editPost, votePost, initialComment, addComment, removeComment, editComment, voteComment} from './actions';
+import { withRouter } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 
@@ -14,127 +16,16 @@ class App extends Component {
 
   state = {
       category:[],
-      filter: "",
+      sortSelect: "votes",
       isEdit: false,
-      isComment: false,
-      isCommentEdit:false,
   }
-
-  formSubmit = (e) => {
-    e.preventDefault();
-    const {addPost} = this.props;    
-    const values = serializeForm(e.target, { hash: true });
-    addPost(values);
-    console.log('Add Form Values',values);
-    const headers = {
-      'Accept': 'application/json',
-      'Authorization': 'whatever-you-want'
-    };
-    fetch(`http://localhost:3001/posts`, {
-    method: 'POST',
-    headers: {
-      ...headers,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(values)
-    }).then(res => res.json());
-  }
-
-  editTrue = ()=> {
-    this.setState({isEdit:true});
-  }
-
-  editFalse = ()=> {
-    this.setState({isEdit:false});
-  }
-
-
-  commentEditTrue = ()=>{
-    this.setState({isCommentEdit:true});
-  }
-
-  commentEdit = (e)=> {
-    e.preventDefault();
-    this.setState({isCommentEdit:false});
-    const {editComment} = this.props;
-    const values = serializeForm(e.target, { hash: true });
-    editComment(values);
-    const headers = {
-      'Accept': 'application/json',
-      'Authorization': 'whatever-you-want'
-    };
-    console.log('commentEdit',values);
-    fetch(`http://localhost:3001/comments/${values.id}`, {
-    method: 'PUT',
-    headers: {
-      ...headers,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(values)
-    }).then(res => res.json());
-  }
-
-  changePost = (e)=>{
-    e.preventDefault();
-    const {editPost} = this.props;
-    const values = serializeForm(e.target, { hash: true });
-    editPost(values);
-    const headers = {
-      'Accept': 'application/json',
-      'Authorization': 'whatever-you-want'
-    };
-    fetch(`http://localhost:3001/posts/${values.id}`, {
-    method: 'PUT',
-    headers: {
-      ...headers,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(values)
-    }).then(res => res.json());
-  }
-
-
-  filterCategory = (e) => {
-    this.setState({filter:e.target.innerHTML});
-  }
-
-  setId = (id,e) => {
-    console.log("Set Id",id);
-    //this.setState({postId:e.target.value});
-  }
-
-  resetFilter = () => {
-    this.setState({filter:""});
-  }
-
-  isComment = ()=> {
-    console.log("is comment called");
-    this.setState({isComment:true});
-  }
-
-  commentSubmit = (e)=>{
-    e.preventDefault();
-    this.setState({isComment:false});
-    const values = serializeForm(e.target, { hash: true });
-    const headers = {
-      'Accept': 'application/json',
-      'Authorization': 'whatever-you-want'
-    };
-     const {addComment} = this.props;
-     addComment(values);
-    fetch(`http://localhost:3001/comments`, {
-    method: 'POST',
-    headers: {
-      ...headers,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(values)
-    }).then(res => res.json());
+ 
+  sortSelect = (e)=>{
+    this.setState({sortSelect:e.target.value})
   }
 
   componentDidMount() {
     const url = `http://localhost:3001/categories`;
-    console.log('fetching from url', url);
     fetch(url, { headers: { 'Authorization': 'whatever-you-want' }} )
       .then( (res) => res.json())
       .then(({categories}) =>  this.setState({category:categories}));
@@ -142,264 +33,57 @@ class App extends Component {
 
   render() {
     const data = this.state.category;
-    console.log(data);
 
-    // const posts = this.state.posts;
-    // console.log(posts);
-
-    const {post, initialPost, addPost, removePost, votePost, addComment, removeComment, voteComment, comments} = this.props
-    console.log("This is post state",post);
-    const isEdit = this.state.isEdit;
-    const isComment = this.state.isComment;
-    const isCommentEdit = this.state.isCommentEdit;
-
-
-    console.log('Main App',post);
+    const {post, removePost, votePost, editPost, addComment, removeComment, voteComment, editComment, comments} = this.props
     return (
       <div className="App">
         <div className="container-fluid">
           <div className="row content">
 
-            
-
             <Route exact path="/" render = {() => (
               <div> 
-                <div className="col-sm-3 sidenav">
-                  <h4>Philips Blog</h4>
-                  <ul className="nav nav-pills nav-stacked" onClick={this.filterCategory}>
-                      {data.map(({name},index)=>{
-                        return <li key={name}><a href="#" key={index}>{name}</a></li>
-                      })}
-                  </ul><br/>
-
-                  <div className="input-group">
-                    <input type="text" className="form-control" placeholder="Search Blog.."></input>
-                    <span className="input-group-btn">
-                      <button className="btn btn-default" type="button">
-                        <span className="glyphicon glyphicon-search"></span>
-                      </button>
-                    </span>
-                  </div>
-
-                </div>
+                <Sidenav data={data}></Sidenav>
 
                 <div className="col-sm-9">
-                  <a href="#" onClick={this.resetFilter}>Reset</a>
-                  <Posts posts={post} filter={this.state.filter} removePost={removePost} setId={this.setId} votePost={votePost}></Posts>
-                  <h4>Add Post:</h4>
-                  <form  id="form-data" onSubmit={this.formSubmit} ref={(form) => this.form = form} >
-                      <input type="hidden" name="id" value={Math.random().toString(36).substr(-10)} ref={(id) => this.id = id}></input>
-                      <input type="hidden" name="timestamp" value={Date.now()} ref={(timeStamp) => this.timeStamp = timeStamp}></input>
-                      <p>Author: </p>
-                      <input name="author" type="text" ref={(author) => this.author = author}></input>
-                      <p>Title: </p>
-                      <input name="title" type="text" ref={(title) => this.title = title}></input>
-                      <p>Category: </p>
-                        <select name="category" ref={(category) => this.category = category}>
-                          <option value="react">React</option>
-                          <option value="redux">Redux</option>
-                          <option value="udacity">Udacity</option>
-                        </select>
-                      <p>Body:</p>
-                      <textarea name="body" className="form-control" rows="3" required ref={(body) => this.body = body}></textarea>
-                    <button type="submit" className="btn btn-success">Submit</button>
-                  </form>
+                  <Link to='/'>View All Posts</Link>
+                  <p>Sort by:</p>
+                  <select onChange={this.sortSelect}>
+                    <option value="votes">Votes</option>
+                    <option value="timeStamp">Time Stamp</option>
+                  </select>
+                  <Posts posts={post} filter="" removePost={removePost} setId={this.setId} votePost={votePost} sort={this.state.sortSelect}></Posts>
+                  <AddPost formSubmit={this.formSubmit} addPost={this.props.addPost}></AddPost>
                   <br/><br/>
                 </div>
-               </div>)}/>
 
-            <Route path="/posts/:id" render = {(props) => (
-                  <div>
-                   <h4><small>RECENT POSTS</small></h4>
-                    <hr/>
-                    {post ? <ul name="Ul" onClick={this.openFoodModal}>
-                      {post.filter((post)=> post.id === props.match.params.id).map(({id,timestamp,author,body,title,category, voteScore},index)=>{
-                        return <li key={id} value={id}>
-                          <a href="#"><h2>{title}</h2></a>
-                          <h5><span className="glyphicon glyphicon-time"></span> Post by {author} at</h5>
-                          <h5><span className="label label-success">{category}</span></h5><br/>
-                          <p>{body}</p>
-                          <p>{voteScore} likes     <button value="like" onClick={(e)=>{
-                                const voteScore = e.target.value;
-                                const values = {option:'upVote'}
-                                
-                                votePost({id, voteScore});
-                                const headers = {
-                                  'Accept': 'application/json',
-                                  'Authorization': 'whatever-you-want'
-                                }
-                                fetch(`http://localhost:3001/posts/${id}`, {
-                                  method: 'POST',
-                                  headers: {
-                                    ...headers,
-                                    'Content-Type': 'application/json'
-                                  },
-                                  body: JSON.stringify(values)
-                                  }).then(res => res.json())
-                            }}>Like</button>
-                            <button value="disLike" onClick={(e)=>{
-                                const voteScore = e.target.value;
-                                votePost({id, voteScore});
-                                const values = {option:'downVote'}
-                                const headers = {
-                                  'Accept': 'application/json',
-                                  'Authorization': 'whatever-you-want'
-                                }
-                                fetch(`http://localhost:3001/posts/${id}`, {
-                                  method: 'POST',
-                                  headers: {
-                                    ...headers,
-                                    'Content-Type': 'application/json'
-                                  },
-                                  body: JSON.stringify(values)
-                                  }).then(res => res.json())
-                            }}>Dislike</button></p>
-                          <button value={id} onClick={(e)=>{
-                            const id = e.target.value;
-                            let token = localStorage.token
-                            if (!token)
-                              token = localStorage.token = Math.random().toString(36).substr(-8);
-                            const headers = {
-                              'Accept': 'application/json',
-                              'Authorization': token
-                            };
-                            fetch(`http://localhost:3001/posts/${id}`, {
-                              method: 'DELETE',
-                              headers: {
-                                ...headers,
-                                'Content-Type': 'application/json'
-                              },
-                            }).then(res => console.log(res.json()));
-                              removePost({id});
-                            }}>Delete</button>
+              </div>)}/>
 
-                          <button onClick={this.editTrue}>Edit</button>
-                           <hr/>
-                           {isEdit && <form  id="form-data" onSubmit={this.changePost} >
-                              <input type="hidden" name="id" value={props.match.params.id} ></input>
-                              <p>Author: </p>
-                              <input name="author" type="text"  defaultValue={author}></input>
-                              <p>Title: </p>
-                              <input name="title" type="text"  defaultValue={title}></input>
-                              <p>Category: </p>
-                                <select name="category" >
-                                  <option value="react">React</option>
-                                  <option value="redux">Redux</option>
-                                  <option value="udacity">Udacity</option>
-                                </select>
-                              <p>Body:</p>
-                              <textarea name="body" className="form-control" rows="3" required  defaultValue={body}></textarea>
-                            <button type="submit" className="btn btn-success">Submit</button>
-                          </form>}
-                        </li>
-                      })}
-                    </ul> : <p>waiting</p>}
-                    
-                    <h4><small>COMMENTS:</small></h4>
-                    <button onClick={this.isComment}>Add Comment</button>
-                    {comments ? <ul>
-                        {comments.filter((comment)=> comment.parentId === props.match.params.id).map((comment,index)=>{
-                          return <li key={index}>
-                              <h5><span className="glyphicon glyphicon-time"></span> Post by {comment.author} at</h5>
-                              <p>{comment.body}</p>
-                              <p>{comment.voteScore} likes     <button value="like" onClick={(e)=>{
-                                    const voteScore = e.target.value;
-                                    const id = comment.id;
-                                    const parentId = comment.parentId;
-                                    const values = {option:'upVote'}
-                                
-                                    const headers = {
-                                      'Accept': 'application/json',
-                                      'Authorization': 'whatever-you-want'
-                                    }
-                                    voteComment({id, parentId, voteScore});
-                                    fetch(`http://localhost:3001/comments/${id}`, {
-                                      method: 'POST',
-                                      headers: {
-                                        ...headers,
-                                        'Content-Type': 'application/json'
-                                      },
-                                      body: JSON.stringify(values)
-                                      }).then(res => res.json())
+            <Route exact path="/:category" render={(props) => (
+                <div>
+                  <Sidenav data={data}></Sidenav>
 
-                                }}>Like</button>
-                                <button value="disLike" onClick={(e)=>{
-                                    const voteScore = e.target.value;
-                                    const id = comment.id;
-                                    const parentId = comment.parentId;
-                                    voteComment({id, parentId, voteScore});
-                                    const values = {option:'downVote'}
-                                
-                                    const headers = {
-                                      'Accept': 'application/json',
-                                      'Authorization': 'whatever-you-want'
-                                    }
-                                    fetch(`http://localhost:3001/comments/${id}`, {
-                                      method: 'POST',
-                                      headers: {
-                                        ...headers,
-                                        'Content-Type': 'application/json'
-                                      },
-                                      body: JSON.stringify(values)
-                                      }).then(res => res.json())
-                                }}>Dislike</button></p>
-                              <button value={comment.id} onClick={(e)=>{
-                                const id = e.target.value;
-                                const parentId = comment.parentId;
-                                console.log('parentId',parentId);
-                                let token = localStorage.token
-                                if (!token)
-                                  token = localStorage.token = Math.random().toString(36).substr(-8);
-                                const headers = {
-                                  'Accept': 'application/json',
-                                  'Authorization': 'whatever-you-want'
-                                };
-                                fetch(`http://localhost:3001/comments/${id}`, {
-                                  method: 'DELETE',
-                                  headers: {
-                                    ...headers,
-                                    'Content-Type': 'application/json'
-                                  },
-                                }).then(res => console.log(res.json()));
-                                  removeComment({id, parentId});
-                                }}>Delete</button>
-                                <button onClick={this.commentEditTrue}>Edit</button>
-                                {isCommentEdit && <div>
-                                  <h4><small>Edit Comment:</small></h4>
-                                  <form onSubmit={this.commentEdit}>
-                                      <input type="hidden" name="id" value={comment.id}></input>
-                                      <input type="hidden" name="timestamp" value={Date.now()} ></input>
-                                      <input type="hidden" name="parentId" value= {props.match.params.id} ></input>
-                                      <p>Author: </p>
-                                      <input name="author" type="text" defaultValue={comment.author}></input>
-                                      <p>Body:</p>
-                                      <textarea name="body" className="form-control" rows="3" required defaultValue={comment.body} ></textarea>
-                                    <button type="submit" className="btn btn-success">Submit</button>
-                                  </form>
-                                  </div>}
-                            </li>
-
-                        })}
-                        {isComment && <div>
-                          <h4><small>New Comment:</small></h4>
-                          <form onSubmit={this.commentSubmit}>
-                              <input type="hidden" name="id" value={Math.random().toString(36).substr(-8)}></input>
-                              <input type="hidden" name="timestamp" value={Date.now()} ></input>
-                              <input type="hidden" name="parentId" value= {props.match.params.id} ></input>
-                              <p>Author: </p>
-                              <input name="author" type="text" ></input>
-                              <p>Body:</p>
-                              <textarea name="body" className="form-control" rows="3" required ></textarea>
-                            <button type="submit" className="btn btn-success">Submit</button>
-                          </form>
-                          </div> }
-                      </ul> : <p>Waiting</p>}
-
-
-                    <hr/>
+                  <div className="col-sm-9">
+                    <Link to='/'>View All Posts</Link>
+                    <p>Sort by:</p>
+                    <select onChange={this.sortSelect}>
+                      <option value="votes">Votes</option>
+                      <option value="timeStamp">Time Stamp</option>
+                    </select>
+                    <Posts posts={post} filter={props.match.params.category} removePost={removePost} setId={this.setId} votePost={votePost} sort={this.state.sortSelect}></Posts>
+                    <AddPost formSubmit={this.formSubmit} addPost={this.props.addPost}></AddPost>
+                    <br/><br/>
                   </div>
+                </div>
+              )}/>
 
-                )}/>
+            <Route exact path="/category/:id" render = {(props) => (
+              <div>
+                <SinglePost post={post} id={props.match.params.id} votePost={votePost} removePost={removePost} editPost={editPost}></SinglePost>
+                        
+                <Comments comments={comments} id={props.match.params.id} voteComment={voteComment} removeComment={removeComment} editComment={editComment} addComment={addComment}></Comments>
+
+                <hr/>
+              </div>)}/>
 
           </div>
         </div>
@@ -409,7 +93,6 @@ class App extends Component {
 }
 
 function mapStateToProps ({ posts, comment }) {
-  //console.log('From Mapping State to Props', Object.entries(comment));
   let comments = [];
   Object.entries(comment).forEach(([key, value]) => {
     Object.entries(value).forEach(([key, value]) => {
@@ -417,7 +100,6 @@ function mapStateToProps ({ posts, comment }) {
     })
   });
   comments = comments.filter((comment)=> comment.deleted === false);
-  console.log('State Mapping',comments);
   //Reducing merging array of arrays
   //comments = [].concat.apply([],comments);
   
@@ -426,8 +108,7 @@ function mapStateToProps ({ posts, comment }) {
   Object.entries(posts).forEach(([key, value]) => {
     post.push(value);
   });
-  post = post.filter((post)=> post.deleted == false);
-  console.log('State Map',post);
+  post = post.filter((post)=> post.deleted === false);
   return {post, comments};
 }
 
