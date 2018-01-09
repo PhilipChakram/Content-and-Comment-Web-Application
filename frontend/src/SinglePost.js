@@ -55,7 +55,9 @@ class SinglePost extends Component {
                           <p>{voteScore} likes     <button value="like" onClick={(e)=>{
                                 const voteScore = e.target.value;
                                 const values = {option:'upVote'}
-                                votePost({id, voteScore});
+                                votePost({id, voteScore});  //Updating the store using votePost action dispatcher
+
+                                /*Updating the database*/
                                 const headers = {
                                   'Accept': 'application/json',
                                   'Authorization': 'whatever-you-want'
@@ -71,7 +73,9 @@ class SinglePost extends Component {
                             }}>Like</button>
                             <button value="disLike" onClick={(e)=>{
                                 const voteScore = e.target.value;
-                                votePost({id, voteScore});
+                                votePost({id, voteScore});  //Updating the store using the votePost action dispatcher
+
+                                /*Updating the database*/
                                 const values = {option:'downVote'}
                                 const headers = {
                                   'Accept': 'application/json',
@@ -88,9 +92,7 @@ class SinglePost extends Component {
                             }}>Dislike</button></p>
                           	<Link to={`/`}><button value={id} onClick={(e)=>{
                             const id = e.target.value;
-                            let token = localStorage.token
-                            if (!token)
-                              token = localStorage.token = Math.random().toString(36).substr(-8);
+                            /*Updating the database*/
                             const headers = {
                               'Accept': 'application/json',
                               'Authorization': 'whatever-you-want'
@@ -102,7 +104,8 @@ class SinglePost extends Component {
                                 'Content-Type': 'application/json'
                               },
                             }).then(res => console.log(res.json()));
-                              removePost({id});
+
+                              removePost({id});  //Updating the store using the removePost action dispatcher
                             }}>Delete</button></Link>
 
                           <button onClick={this.editTrue}>Edit</button>

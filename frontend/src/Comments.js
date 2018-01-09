@@ -21,7 +21,9 @@ class Comments extends Component {
 	    this.setState({isCommentEdit:false});
 	    const {editComment} = this.props;
 	    const values = serializeForm(e.target, { hash: true });
-	    editComment(values);
+	    editComment(values);  // Updating the store using editComment action dispatcher
+
+      /* Updating the database */
 	    const headers = {
 	      'Accept': 'application/json',
 	      'Authorization': 'whatever-you-want'
@@ -45,7 +47,9 @@ class Comments extends Component {
 	      'Authorization': 'whatever-you-want'
 	    };
 	    const {addComment} = this.props;
-	    addComment(values);
+	    addComment(values);  // Updating the store using addComment action dispatcher
+
+      /* Updating the database */
 	    fetch(`http://localhost:3001/comments`, {
 	    method: 'POST',
 	    headers: {
@@ -73,12 +77,14 @@ class Comments extends Component {
                                     const voteScore = e.target.value;
                                     const id = comment.id;
                                     const parentId = comment.parentId;
+                                    voteComment({id, parentId, voteScore});  //Updating the store using voteComment action dispatcher
+
+                                    /* Updating the database */
                                     const values = {option:'upVote'}
                                     const headers = {
                                       'Accept': 'application/json',
                                       'Authorization': 'whatever-you-want'
                                     }
-                                    voteComment({id, parentId, voteScore});
                                     fetch(`http://localhost:3001/comments/${id}`, {
                                       method: 'POST',
                                       headers: {
@@ -92,7 +98,9 @@ class Comments extends Component {
                                     const voteScore = e.target.value;
                                     const id = comment.id;
                                     const parentId = comment.parentId;
-                                    voteComment({id, parentId, voteScore});
+                                    voteComment({id, parentId, voteScore});  //Updating the store using voteComment action dispatcher
+
+                                    /* updating the database */
                                     const values = {option:'downVote'}
                                     const headers = {
                                       'Accept': 'application/json',
@@ -110,6 +118,8 @@ class Comments extends Component {
                               	<button value={comment.id} onClick={(e)=>{
 	                                const id = e.target.value;
 	                                const parentId = comment.parentId;
+
+                                  /* Updating the database */
 	                                const headers = {
 	                                  'Accept': 'application/json',
 	                                  'Authorization': 'whatever-you-want'
@@ -121,7 +131,8 @@ class Comments extends Component {
 	                                    'Content-Type': 'application/json'
 	                                  },
 	                                }).then(res => console.log(res.json()));
-	                                  removeComment({id, parentId});
+
+	                                  removeComment({id, parentId});  //Updating the store using removeComment action dispatcher
                                 	}}>Delete</button>
                                 <button onClick={this.commentEditTrue}>Edit</button>
                                 {isCommentEdit && <div>

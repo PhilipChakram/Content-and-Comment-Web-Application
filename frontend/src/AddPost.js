@@ -4,12 +4,15 @@ import serializeForm from 'form-serialize';
 
 
 class AddPost extends Component {
+
 	formSubmit = (e) => {
 	    e.preventDefault();
 	    const {addPost} = this.props;    
 	    const values = serializeForm(e.target, { hash: true });
 	    e.target.reset();
-	    addPost(values);
+	    addPost(values);  //Update the store using addPost action dispatcher
+
+	    /* Updating the database */
 	    const headers = {
 	      'Accept': 'application/json',
 	      'Authorization': 'whatever-you-want'
