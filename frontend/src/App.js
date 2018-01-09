@@ -9,7 +9,7 @@ import { Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { initialPost,addPost,removePost, editPost, votePost, initialComment, addComment, removeComment, editComment, voteComment} from './actions';
 import { withRouter } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Link, Switch } from 'react-router-dom';
 
 
 class App extends Component {
@@ -33,33 +33,15 @@ class App extends Component {
 
   render() {
     const data = this.state.category;
-
     const {post, removePost, votePost, editPost, addComment, removeComment, voteComment, editComment, comments} = this.props
     return (
       <div className="App">
         <div className="container-fluid">
           <div className="row content">
 
-            <Route exact path="/" render = {() => (
-              <div> 
-                <Sidenav data={data}></Sidenav>
-
-                <div className="col-sm-9">
-                  <Link to='/'>View All Posts</Link>
-                  <p>Sort by:</p>
-                  <select onChange={this.sortSelect}>
-                    <option value="votes">Votes</option>
-                    <option value="timeStamp">Time Stamp</option>
-                  </select>
-                  <Posts posts={post} filter="" removePost={removePost} setId={this.setId} votePost={votePost} sort={this.state.sortSelect}></Posts>
-                  <AddPost formSubmit={this.formSubmit} addPost={this.props.addPost}></AddPost>
-                  <br/><br/>
-                </div>
-
-              </div>)}/>
-
-            <Route exact path="/:category" render={(props) => (
-                <div>
+            <Switch>
+              <Route exact path="/" render = {() => (
+                <div> 
                   <Sidenav data={data}></Sidenav>
 
                   <div className="col-sm-9">
@@ -69,21 +51,45 @@ class App extends Component {
                       <option value="votes">Votes</option>
                       <option value="timeStamp">Time Stamp</option>
                     </select>
-                    <Posts posts={post} filter={props.match.params.category} removePost={removePost} setId={this.setId} votePost={votePost} sort={this.state.sortSelect}></Posts>
+                    <Posts posts={post} filter="" removePost={removePost} setId={this.setId} votePost={votePost} sort={this.state.sortSelect}></Posts>
                     <AddPost formSubmit={this.formSubmit} addPost={this.props.addPost}></AddPost>
                     <br/><br/>
                   </div>
-                </div>
-              )}/>
 
-            <Route exact path="/category/:id" render = {(props) => (
-              <div>
-                <SinglePost post={post} id={props.match.params.id} votePost={votePost} removePost={removePost} editPost={editPost}></SinglePost>
-                        
-                <Comments comments={comments} id={props.match.params.id} voteComment={voteComment} removeComment={removeComment} editComment={editComment} addComment={addComment}></Comments>
+                </div>)}/>
 
-                <hr/>
-              </div>)}/>
+              <Route exact path="/:category" render={(props) => (
+                  <div>
+                    {data.filter((category)=> category.name === props.match.params.category).length ? <div>
+                      <Sidenav data={data}></Sidenav>
+                      <div className="col-sm-9">
+                        <Link to='/'>View All Posts</Link>
+                        <p>Sort by:</p>
+                        <select onChange={this.sortSelect}>
+                          <option value="votes">Votes</option>
+                          <option value="timeStamp">Time Stamp</option>
+                        </select>
+                        <Posts posts={post} filter={props.match.params.category} removePost={removePost} setId={this.setId} votePost={votePost} sort={this.state.sortSelect}></Posts>
+                        <AddPost formSubmit={this.formSubmit} addPost={this.props.addPost}></AddPost>
+                        <br/><br/> 
+                      </div>
+                      </div> : <h2>Error 404: Page not found</h2>}
+                    </div> )}/>
+
+              <Route exact path="/:category/:id" render = {(props) => (
+                 <div>
+                    {post.filter((post)=> post.id === props.match.params.id).length ? <div>
+                      <Sidenav data={data}></Sidenav>
+                    <Link to='/'>View All Posts</Link>
+                    <SinglePost post={post} id={props.match.params.id} votePost={votePost} removePost={removePost} editPost={editPost}></SinglePost>
+                    <Comments comments={comments} id={props.match.params.id} voteComment={voteComment} removeComment={removeComment} editComment={editComment} addComment={addComment}></Comments>
+                    </div> : <h2>Error 404: Post Not Found</h2>}
+                 </div> )}/>
+
+              <Route render={(props) => (
+                  <h2>Error 404: Page not found</h2>
+                )}/>
+            </Switch>
 
           </div>
         </div>

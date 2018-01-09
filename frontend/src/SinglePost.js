@@ -41,14 +41,15 @@ class SinglePost extends Component {
 		const {post, id, votePost, removePost} = this.props;
 		const {isEdit} = this.state;
 		return(<div>
-				<h4><small>RECENT POSTS</small></h4>
+				<h4><small>POST</small></h4>
                     <hr/>
                     {post ? <ul name="Ul">
-                      {post.filter((post)=> post.id === id).map(({id,timestamp,author,body,title,category, voteScore},index)=>{
+                      {post.filter((post)=> post.id === id).map(({id,timestamp,author,body,title,category,voteScore,commentCount},index)=>{
                       	const date = new Date(parseInt(timestamp,10));
                         return <li key={id} value={id}>
                           <a><h2>{title}</h2></a>
                           <h5><span className="glyphicon glyphicon-time"></span> Post by {author} at {date.toString()}</h5>
+                          <h5><span className="glyphicon"></span> {commentCount} comments</h5>
                           <h5><span className="label label-success">{category}</span></h5><br/>
                           <p>{body}</p>
                           <p>{voteScore} likes     <button value="like" onClick={(e)=>{

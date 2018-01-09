@@ -85,7 +85,22 @@ function posts (state = {}, action) {
 					}
 				};
 			}
-			
+		case ADD_COMMENT :
+			return {
+					...state,
+					[action.parentId]:{
+						...state[action.parentId],
+						commentCount:state[action.parentId].commentCount + 1,
+					}
+				};
+		case REMOVE_COMMENT :
+			return {
+					...state,
+					[action.parentId]:{
+						...state[action.parentId],
+						commentCount:state[action.parentId].commentCount - 1,
+					}
+				};
 		default :
 			return state
 	}
@@ -109,7 +124,7 @@ function comment (state = {}, action) {
 		case ADD_COMMENT :
 			const {parentId, timestamp, body, author} = action
 			const ID = action.id;
-			obj = state[parentId];			
+			obj = state[parentId];
 			return {
 				...state,
 				[parentId]:{
